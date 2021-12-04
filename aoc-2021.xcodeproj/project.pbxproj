@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E65C0D39275BF69900DE95D9 /* day1.m in Sources */ = {isa = PBXBuildFile; fileRef = E65C0D38275BF69900DE95D9 /* day1.m */; };
 		E68DA02C275B20DB00C315FC /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E68DA02B275B20DB00C315FC /* main.m */; };
 /* End PBXBuildFile section */
 
@@ -23,6 +24,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		E65C0D38275BF69900DE95D9 /* day1.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = day1.m; sourceTree = "<group>"; };
+		E65C0D3A275BF70C00DE95D9 /* day1.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = day1.h; sourceTree = "<group>"; };
 		E68DA028275B20DB00C315FC /* aoc-2021 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "aoc-2021"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E68DA02B275B20DB00C315FC /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -41,6 +44,9 @@
 		E68DA01F275B20DB00C315FC = {
 			isa = PBXGroup;
 			children = (
+				E65C0D38275BF69900DE95D9 /* day1.m */,
+				E65C0D3A275BF70C00DE95D9 /* day1.h */,
+				E68DA02B275B20DB00C315FC /* main.m */,
 				E68DA02A275B20DB00C315FC /* aoc-2021 */,
 				E68DA029275B20DB00C315FC /* Products */,
 			);
@@ -57,7 +63,6 @@
 		E68DA02A275B20DB00C315FC /* aoc-2021 */ = {
 			isa = PBXGroup;
 			children = (
-				E68DA02B275B20DB00C315FC /* main.m */,
 			);
 			path = "aoc-2021";
 			sourceTree = "<group>";
@@ -119,6 +124,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E65C0D39275BF69900DE95D9 /* day1.m in Sources */,
 				E68DA02C275B20DB00C315FC /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
