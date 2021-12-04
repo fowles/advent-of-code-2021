@@ -1,25 +1,9 @@
-//
-//  day1.m
-//  aoc-2021
-//
-//  Created by Beaker Kulukundis on 12/4/21.
-//
-
 #import <Foundation/Foundation.h>
 
 #import "day1.h"
+#import "parsing.h"
 
-NSString* readFile(NSString* path) {
-  return [[NSString stringWithContentsOfFile:@"input/day1.txt"
-                                    encoding:NSUTF8StringEncoding
-                                       error:NULL]
-      stringByTrimmingCharactersInSet:NSCharacterSet
-                                          .whitespaceAndNewlineCharacterSet];
-}
-
-NSArray *splitLines(NSString *s) { return [s componentsSeparatedByString:@"\n"]; }
-
-int part1(NSArray *lines) {
+int day1part1(NSArray<NSString*>* lines) {
   int increasing = 0;
   for (int i = 1; i < lines.count; ++i) {
     int prev = [lines[i - 1] intValue];
@@ -31,7 +15,7 @@ int part1(NSArray *lines) {
   return increasing;
 }
 
-int part2(NSArray *lines) {
+int day1part2(NSArray<NSString*>* lines) {
   int increasing = 0;
   for (int i = 3; i < lines.count; ++i) {
     int prev = [lines[i - 3] intValue];
@@ -41,4 +25,11 @@ int part2(NSArray *lines) {
     }
   }
   return increasing;
+}
+
+int day1main(int argc, const char** argv) {
+  id lines = splitLines(readFile(@"input/day1.txt"));
+  NSLog(@"Part 1: %d", day1part1(lines));
+  NSLog(@"Part 2: %d", day1part2(lines));
+  return 0;
 }
