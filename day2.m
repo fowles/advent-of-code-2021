@@ -20,16 +20,23 @@ int day2part1(NSArray<NSArray<NSString*>*>* commands) {
   return depth * position;
 }
 
-int day2part2(NSArray<NSString*>* lines) {
-  int increasing = 0;
-  for (int i = 3; i < lines.count; ++i) {
-    int prev = [lines[i - 3] intValue];
-    int cur = [lines[i] intValue];
-    if (prev < cur) {
-      ++increasing;
+int day2part2(NSArray<NSArray<NSString*>*>* commands) {
+  int depth = 0;
+  int position = 0;
+  int aim = 0;
+  for (id command in commands) {
+    if ([command[0] isEqualToString:@"forward"]) {
+      position += [command[1] intValue];
+      depth += aim * [command[1] intValue];
+    }
+    if ([command[0] isEqualToString:@"down"]) {
+      aim += [command[1] intValue];
+    }
+    if ([command[0] isEqualToString:@"up"]) {
+      aim -= [command[1] intValue];
     }
   }
-  return increasing;
+  return depth * position;
 }
 
 int day2main(int argc, const char** argv) {
@@ -39,5 +46,6 @@ int day2main(int argc, const char** argv) {
                                                        options:0
                                                          error:NULL]);
   NSLog(@"Part 1: %d", day2part1(parsed));
+  NSLog(@"Part 2: %d", day2part2(parsed));
   return 0;
 }
