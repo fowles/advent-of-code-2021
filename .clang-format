@@ -1,0 +1,3 @@
+Language: ObjC
+DerivePointerAlignment: false
+PointerAlignment: Left
