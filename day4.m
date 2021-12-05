@@ -6,6 +6,7 @@
 @interface Bingo:NSObject {
    int slots[5][5];
    bool marked[5][5];
+   bool won;
 }
 
 + (instancetype)init:(NSArray<NSString*>*)card;
@@ -23,6 +24,7 @@
   }
 
   Bingo* b = [Bingo alloc];
+  b->won = false;
   NSEnumerator* it = [card objectEnumerator];
   for (int i = 0; i < 5; ++i) {
     for (int j = 0; j < 5; ++j) {
@@ -56,10 +58,13 @@
       v = false;
     }
   }
-  return h || v;
+  self->won = h || v;
+  return self->won;
 }
 
 - (bool)markValue:(NSInteger)v {
+  if (self->won) return false;
+
   for (int i = 0; i < 5; ++i) {
     for (int j = 0; j < 5; ++j) {
       if (self->slots[i][j] == v) {
@@ -94,6 +99,19 @@ NSInteger day4part1(NSArray<NSString*>* draws, NSArray<Bingo*>* cards) {
   return 0;
 }
 
+NSInteger day4part2(NSArray<NSString*>* draws, NSArray<Bingo*>* cards) {
+  NSInteger last_win = 0;
+  for (id draw in draws) {
+    NSInteger call = [draw integerValue];
+    for (Bingo* b in cards) {
+      if ([b markValue: call]) {
+        last_win = call * [b unmarkedSum];
+      }
+    }
+  }
+  return last_win;
+}
+
 int day4main(int argc, const char** argv) {
   id lines = split(readFile(@"input/day4.txt"), @"\n\n");
   id parsed = parseLines(
@@ -102,10 +120,14 @@ int day4main(int argc, const char** argv) {
                                                          error:NULL]);
   NSArray<NSString*>* draws = parsed[0];
   [parsed removeObjectAtIndex:0];
-  id cards = parseObjects(parsed, ^(NSArray<NSString*>* v) {
+  id cards1 = parseObjects(parsed, ^(NSArray<NSString*>* v) {
     return [Bingo init:v];
   });
+  NSLog(@"Part 1: %ld", day4part1(draws, cards1));
 
-  NSLog(@"Part 1: %ld", day4part1(draws, cards));
+  id cards2 = parseObjects(parsed, ^(NSArray<NSString*>* v) {
+    return [Bingo init:v];
+  });
+  NSLog(@"Part 2: %ld", day4part2(draws, cards2));
   return 0;
 }
