@@ -10,8 +10,12 @@ NSString* readFile(NSString* path) {
                                           .whitespaceAndNewlineCharacterSet];
 }
 
-NSArray<NSString*>* splitLines(NSString* s) {
-  return [s componentsSeparatedByString:@"\n"];
+NSArray<NSString*>* split(NSString* unsplit, NSString* sep) {
+  return [unsplit componentsSeparatedByString:sep];
+}
+
+NSArray<NSString*>* splitLines(NSString* unsplit) {
+  return split(unsplit, @"\n");
 }
 
 NSArray<NSArray<NSString*>*>* parseLines(NSArray<NSString*>* lines,
@@ -22,18 +26,24 @@ NSArray<NSArray<NSString*>*>* parseLines(NSArray<NSString*>* lines,
         [regex matchesInString:line
                        options:0
                          range:NSMakeRange(0, line.length)];
-    if (matches.count != 1) {
-      [NSException raise:@"Parse error" format:@"line %@ with %@", line, regex];
-    }
+    id m = [NSMutableArray arrayWithCapacity:8];
     for (NSTextCheckingResult* match in matches) {
       NSUInteger num_ranges = match.numberOfRanges;
-      id m = [NSMutableArray arrayWithCapacity:num_ranges];
       for (NSUInteger i = 1; i < num_ranges; ++i) {
         NSRange r = [match rangeAtIndex:i];
         [m addObject:[line substringWithRange:r]];
       }
-      [result addObject:m];
     }
+    [result addObject:m];
+  }
+  return result;
+}
+
+NSArray<id>* parseObjects(NSArray<NSArray<NSString*>*>* lines,
+                          id (^block)(NSArray<NSString*>*)) {
+  id result = [NSMutableArray arrayWithCapacity:lines.count];
+  for (id line in lines) {
+    [result addObject:block(line)];
   }
   return result;
 }
