@@ -12,4 +12,14 @@ NSArray<NSArray<NSString*>*>* parseLines(NSArray<NSString*>* lines,
 NSArray<id>* parseObjects(NSArray<NSArray<NSString*>*>* lines,
                           id (^block)(NSArray<NSString*>*));
 
+#define SWAP(type, a_, b_) \
+  do { \
+        struct { type *a; type *b; type t; } SWAP; \
+        SWAP.a  = &(a_); \
+        SWAP.b  = &(b_); \
+        SWAP.t  = *SWAP.a; \
+        *SWAP.a = *SWAP.b; \
+        *SWAP.b =  SWAP.t; \
+  } while (0)
+
 #endif /* parsing_h */

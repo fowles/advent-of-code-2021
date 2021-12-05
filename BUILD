@@ -2,7 +2,7 @@ load("@build_bazel_rules_apple//apple:macos.bzl", "macos_command_line_applicatio
 
 objc_library(
     name = "Lib",
-    srcs = glob([ "*.m" ]),
+    srcs = glob([ "*.m*" ]),
     hdrs = glob([ "*.h" ]),
 )
 
