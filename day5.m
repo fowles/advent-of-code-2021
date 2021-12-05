@@ -9,6 +9,7 @@
 
 + (instancetype)init;
 - (void)addLine:(NSArray<NSString*>*)line;
+- (void)addDiagonals:(NSArray<NSString*>*)line;
 - (int)countDanger;
 - (NSString*)area:(int)size;
 @end
@@ -37,16 +38,33 @@
   int y1 = [line[1] intValue];
   int x2 = [line[2] intValue];
   int y2 = [line[3] intValue];
-  if (x1 > x2) SWAP(int, x1, x2);
-  if (y1 > y2) SWAP(int, y1, y2);
   if (x1 == x2) {
-    for (int j = y1; j <= y2; ++j) {
-      ++self->vents[x1][j];
+    int dy = y1 < y2 ? 1 : -1;
+    for (; y1 != y2; y1 += dy) {
+      ++self->vents[x1][y1];
     }
+    ++self->vents[x1][y1];
   } else if (y1 == y2) {
-    for (int i = x1; i <= x2; ++i) {
-      ++self->vents[i][y1];
+    int dx = x1 < x2 ? 1 : -1;
+    for (; x1 != x2; x1 += dx) {
+      ++self->vents[x1][y1];
     }
+    ++self->vents[x1][y1];
+  }
+}
+
+- (void)addDiagonals:(NSArray<NSString*>*)line {
+  int x1 = [line[0] intValue];
+  int y1 = [line[1] intValue];
+  int x2 = [line[2] intValue];
+  int y2 = [line[3] intValue];
+  if (x1 != x2 && y1 != y2) {
+    int dx = x1 < x2 ? 1 : -1;
+    int dy = y1 < y2 ? 1 : -1;
+    for (; x1 != x2; x1 += dx, y1 += dy) {
+      ++self->vents[x1][y1];
+    }
+    ++self->vents[x1][y1];
   }
 }
 
@@ -76,5 +94,9 @@ int day5main(int argc, const char** argv) {
     [f addLine: p];
   }
   NSLog(@"Part 1: %d", [f countDanger]);
+  for (id p in parsed) {
+    [f addDiagonals: p];
+  }
+  NSLog(@"Part 2: %d", [f countDanger]);
   return 0;
 }
