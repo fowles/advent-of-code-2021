@@ -8,10 +8,11 @@
 #import "day4.h"
 #import "day5.h"
 #import "day6.h"
+#import "day7.h"
 
 int main(int argc, const char** argv) {
   chdir(getenv("BUILD_WORKING_DIRECTORY"));
   @autoreleasepool {
-    return day6main(argc, argv);
+    return day7main(argc, argv);
   }
 }
