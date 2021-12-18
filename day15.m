@@ -29,7 +29,7 @@ int day15part2(NSArray<NSString*>* lines) {
 
 int day15main(int argc, const char** argv) {
   id lines = splitLines(readFile(@"input/day15.txt"));
-  NSLog(@"Part 15: %d", day15part15(lines));
+  NSLog(@"Part 1: %d", day15part15(lines));
   NSLog(@"Part 2: %d", day15part2(lines));
   return 0;
 }
