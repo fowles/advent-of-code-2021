@@ -34,6 +34,6 @@
 int main(int argc, const char** argv) {
   chdir(getenv("BUILD_WORKING_DIRECTORY"));
   @autoreleasepool {
-    return day12main(argc, argv);
+    return day13main(argc, argv);
   }
 }
