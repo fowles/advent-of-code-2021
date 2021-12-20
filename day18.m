@@ -252,8 +252,18 @@ int day18part1(NSArray<SFNumber*>* lines) {
   return [res magnitude];
 }
 
-int day18part2(NSArray<SFNumber*>* lines) {
-  return 0;
+int day18part2(NSArray<NSString*>* lines) {
+  int max = 0;
+  for (id lhs in lines) {
+    for (id rhs in lines) {
+      id l = [SFNumber parse:lhs];
+      id r = [SFNumber parse:rhs];
+      id sum = [l add: r];
+      int v = [[sum regularize] magnitude];
+      if (v > max) max = v;
+    }
+  }
+  return max;
 }
 
 void Test(SFNumber* lhs, SFNumber* rhs) {
@@ -276,6 +286,6 @@ int day18main(int argc, const char** argv) {
        [SFNumber parse:@"[7,[6,[5,[7,0]]]]"]);
 
   NSLog(@"Part 1: %d", day18part1(nums));
-  NSLog(@"Part 2: %d", day18part2(nums));
+  NSLog(@"Part 2: %d", day18part2(lines));
   return 0;
 }
