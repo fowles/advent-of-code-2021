@@ -102,7 +102,7 @@
   [r addObject:[Position  x:-s.z  y: s.x  z:-s.y]];
   [r addObject:[Position  x:-s.x  y:-s.z  z:-s.y]];
   [r addObject:[Position  x: s.z  y:-s.x  z:-s.y]];
-  [r addObject:[Position  x: s.x  y:-s.y  z: s.z]];
+  [r addObject:[Position  x: s.x  y:-s.y  z:-s.z]];
   [r addObject:[Position  x:-s.z  y:-s.y  z:-s.x]];
   [r addObject:[Position  x:-s.x  y:-s.y  z: s.z]];
   [r addObject:[Position  x: s.z  y:-s.y  z: s.x]];
@@ -266,6 +266,7 @@ NSMutableArray<Position*>* ParseBeacons(NSString* text) {
       }
     }
   }
+  if (best != 12) return;
 
   self.position = best_pos;
   for (Position* p in self->beacons) {
@@ -312,8 +313,16 @@ RETRY:
   return (int)[all count];
 }
 
-int day19part2() {
-  return 0;
+int day19part2(NSArray<Scanner*>* scanners) {
+  int max = 0;
+  for (Scanner* lhs in scanners) {
+    for (Scanner* rhs in scanners) {
+      Position* d = [lhs.position sub: rhs.position];
+      int dist = ABS(d.x) + ABS(d.y) + ABS(d.z);
+      if (dist > max) max = dist;
+    }
+  }
+  return max;
 }
 
 int day19main(int argc, const char** argv) {
@@ -325,6 +334,6 @@ int day19main(int argc, const char** argv) {
   [scanners[0] setPosition: [Position alloc]];
 
   NSLog(@"Part 1: %d", day19part1(scanners));
-  NSLog(@"Part 2: %d", day19part2());
+  NSLog(@"Part 2: %d", day19part2(scanners));
   return 0;
 }
