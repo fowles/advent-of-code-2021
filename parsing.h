@@ -6,6 +6,7 @@
 NSString* readFile(NSString* path);
 NSArray<NSString*>* split(NSString* unsplit, NSString* sep);
 NSArray<NSString*>* splitLines(NSString* unsplit);
+NSArray<NSString*>* parseLine(NSString* lines, NSRegularExpression* regex);
 NSArray<NSArray<NSString*>*>* parseLines(NSArray<NSString*>* lines,
                                          NSRegularExpression* regex);
 

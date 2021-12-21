@@ -18,23 +18,25 @@ NSArray<NSString*>* splitLines(NSString* unsplit) {
   return split(unsplit, @"\n");
 }
 
+NSArray<NSString*>* parseLine(NSString* line, NSRegularExpression* regex) {
+  NSArray<NSTextCheckingResult*>* matches =
+      [regex matchesInString:line options:0 range:NSMakeRange(0, line.length)];
+  id m = [NSMutableArray arrayWithCapacity:[regex numberOfCaptureGroups]];
+  for (NSTextCheckingResult* match in matches) {
+    NSUInteger num_ranges = match.numberOfRanges;
+    for (NSUInteger i = 1; i < num_ranges; ++i) {
+      NSRange r = [match rangeAtIndex:i];
+      [m addObject:[line substringWithRange:r]];
+    }
+  }
+  return m;
+}
+
 NSArray<NSArray<NSString*>*>* parseLines(NSArray<NSString*>* lines,
                                          NSRegularExpression* regex) {
   id result = [NSMutableArray arrayWithCapacity:lines.count];
   for (NSString* line in lines) {
-    NSArray<NSTextCheckingResult*>* matches =
-        [regex matchesInString:line
-                       options:0
-                         range:NSMakeRange(0, line.length)];
-    id m = [NSMutableArray arrayWithCapacity:8];
-    for (NSTextCheckingResult* match in matches) {
-      NSUInteger num_ranges = match.numberOfRanges;
-      for (NSUInteger i = 1; i < num_ranges; ++i) {
-        NSRange r = [match rangeAtIndex:i];
-        [m addObject:[line substringWithRange:r]];
-      }
-    }
-    [result addObject:m];
+    [result addObject:parseLine(line, regex)];
   }
   return result;
 }
