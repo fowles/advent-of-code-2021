@@ -52,13 +52,18 @@
 
 @interface Image:NSObject {
   NSString* key;
-  NSMutableSet<Pixel*>* pixels;
+  bool pixels[10000][10000];
   char present;
   char missing;
+  int min_x;
+  int max_x;
+  int min_y;
+  int max_y;
 }
 
 + (instancetype)parse:(NSString*)text;
-- (char)x:(int)x y:(int)y;
+- (void)setX:(int)x Y:(int)y;
+- (char)getX:(int)x Y:(int)y;
 - (int)regionAtX:(int)x y:(int)y;
 - (Image*)enhance;
 - (size_t)countPixels;
@@ -69,27 +74,32 @@
 + (instancetype)parse:(NSString*)text; {
   id parts = split(text, @"\n\n");
 
-  id pixels = [NSMutableSet setWithCapacity:512];
   id lines = splitLines(parts[1]);
-  for (int j = 0; j < [lines count]; ++j) {
-    id line = lines[j];
-    for (int i = 0; i < [line length]; ++i) {
-      if ([line characterAtIndex:i] == '#') {
-        [pixels addObject:[Pixel x:i y:j]];
-      }
-    }
-  }
 
   Image* s = [Image alloc];
   s->key = [parts[0] stringByReplacingOccurrencesOfString:@"\n" withString:@""];
   s->present = '#';
   s->missing = '.';
-  s->pixels = pixels;
+  for (int j = 0; j < [lines count]; ++j) {
+    id line = lines[j];
+    for (int i = 0; i < [line length]; ++i) {
+      if ([line characterAtIndex:i] == '#') {
+        [s setX:i Y:j];
+      }
+    }
+  }
   return s;
 }
 
-- (char)x:(int)x y:(int)y {
-  return [pixels containsObject:[Pixel x:x y:y]] ? present : missing;
+- (void)setX:(int)x Y:(int)y {
+  if (x < min_x) min_x = x;
+  if (x > max_x) max_x = x;
+  if (y < min_y) min_y = y;
+  if (y > max_y) max_y = y;
+  pixels[5000 + x][5000+y] = true;
+}
+- (char)getX:(int)x Y:(int)y {
+  return pixels[5000 + x][5000+y] ? present : missing;
 }
 
 - (int)regionAtX:(int)x y:(int)y {
@@ -97,7 +107,7 @@
   for (int j = -1; j <= 1; ++j) {
     for (int i = -1; i <= 1; ++i) {
       res <<= 1;
-      res |= [self x:x + i y:y + j] == '#' ? 1 : 0;
+      res |= [self getX:x + i Y:y + j] == '#' ? 1 : 0;
     }
   }
   return res;
@@ -108,27 +118,23 @@
 }
 
 - (Image*)enhance {
-  int min_x = INT_MAX;
-  int max_x = INT_MIN;
-  int min_y = INT_MAX;
-  int max_y = INT_MIN;
-  for (Pixel* p in pixels) {
-    if (p.x < min_x) min_x = p.x;
-    if (p.y < min_y) min_y = p.y;
-    if (p.x > max_x) max_x = p.x;
-    if (p.y > max_y) max_y = p.y;
-  }
-
   Image* r = [Image alloc];
-  r->pixels = [NSMutableSet setWithCapacity:512];
+  r->min_x = min_x;
+  r->max_x = max_x;
+  r->min_y = min_y;
+  r->max_y = max_y;
   r->key = key;
-  r->missing = [self enhanceX:INT_MAX y:INT_MAX];
+  if (missing == '.') {
+    r->missing = [key characterAtIndex:0];
+  } else {
+    r->missing = [key characterAtIndex:511];
+  }
   r->present = r->missing == '#' ? '.' : '#';
   for (int i = min_x - 1; i <= max_x + 1; ++i) {
     for (int j = min_y - 1; j <= max_y + 1; ++j) {
       char c = [self enhanceX:i y:j];
       if (r->present == c) {
-        [r->pixels addObject:[Pixel x:i y:j]];
+        [r setX:i Y:j];
       }
     }
   }
@@ -137,25 +143,22 @@
 
 - (size_t)countPixels {
   assert(missing == '.');
-  return [pixels count];
+  size_t res = 0;
+  for (int i = min_x - 1; i <= max_x + 1; ++i) {
+    for (int j = min_y - 1; j <= max_y + 1; ++j) {
+      if ([self getX:i Y:j] == '#') {
+        ++res;
+      }
+    }
+  }
+  return res;
 }
 
 - (NSString*)description {
-  int min_x = INT_MAX;
-  int max_x = INT_MIN;
-  int min_y = INT_MAX;
-  int max_y = INT_MIN;
-  for (Pixel* p in pixels) {
-    if (p.x < min_x) min_x = p.x;
-    if (p.y < min_y) min_y = p.y;
-    if (p.x > max_x) max_x = p.x;
-    if (p.y > max_y) max_y = p.y;
-  }
   NSString* s = @"Image:\n";
   for (int j = min_y; j <= max_y; ++j) {
     for (int i = min_y; i <= max_y; ++i) {
-      Pixel* p = [Pixel x:i y:j];
-      char c = [pixels containsObject:p] ? present : missing;
+      char c = [self getX:i Y:j];
       s = [s stringByAppendingFormat:@"%c", c];
     }
     s = [s stringByAppendingString:@"\n"];
@@ -170,14 +173,17 @@ size_t day20part1(Image* image) {
   return [image countPixels];
 }
 
-int day20part2() {
-  return 0;
+size_t day20part2(Image* image) {
+  for (int i = 0; i < 50; ++i) {
+    image = [image enhance];
+  }
+  return [image countPixels];
 }
 
 int day20main(int argc, const char** argv) {
   id raw = readFile(@"input/day20.txt");
   Image* image = [Image parse:raw];
   NSLog(@"Part 1: %zu", day20part1(image));
-  NSLog(@"Part 2: %d", day20part2());
+  NSLog(@"Part 2: %zu", day20part2(image));
   return 0;
 }
