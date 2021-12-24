@@ -18,7 +18,7 @@ int DesiredHome(char c) {
   // ###C#A#D#D###
   //   #B#A#B#C#
   //   #########
-  @public char grid[13][5];
+  @public char grid[13][7];
   @public int cost;
   Map* parent;
 }
@@ -44,7 +44,7 @@ int DesiredHome(char c) {
 
 - (instancetype)moveX:(int)ox Y:(int)oy toX:(int)nx Y:(int)ny {
   Map* p = [self copy];
-  p->parent = self;
+  p->parent = nil;
   char v = grid[ox][oy];
   p->grid[ox][oy] = '.';
   p->grid[nx][ny] = v;
@@ -61,7 +61,7 @@ int DesiredHome(char c) {
 
 - (NSString*)description {
   NSMutableString* res = [NSMutableString stringWithFormat:@"Map: %d\n", cost];
-  for (int j = 0; j < 5; ++j) {
+  for (int j = 0; j < 7; ++j) {
     for (int i = 0; i < 13; ++i) {
       [res appendFormat:@"%c", grid[i][j]];
     }
@@ -93,7 +93,7 @@ int DesiredHome(char c) {
 - (NSUInteger)hash {
   NSUInteger result = 1;
   NSUInteger prime = 31;
-  for (int j = 0; j < 5; ++j) {
+  for (int j = 0; j < 7; ++j) {
     for (int i = 0; i < 13; ++i) {
       result = prime * result + grid[i][j];
     }
@@ -103,51 +103,42 @@ int DesiredHome(char c) {
 }
 
 - (bool)IsDone {
-  return 
-    grid[3][2] == 'A' && grid[3][3] == 'A' &&
-    grid[5][2] == 'B' && grid[5][3] == 'B' &&
-    grid[7][2] == 'C' && grid[7][3] == 'C' &&
-    grid[9][2] == 'D' && grid[9][3] == 'D';
+  for (int i = 3; i < 10; i += 2) {
+    for (int j = 2; j < 6; ++j) {
+      if (grid[i][j] != DesiredLetter(i)) return false;
+    }
+  }
+  return true;
 }
 
 - (void)Adjacent:(void (^)(const Map* map))block {
-  // Move from destination 1
+  // Move from destination
   for (int i = 3; i < 10; i += 2) {
-    if (DesiredLetter(i) == grid[i][2] && DesiredLetter(i) == grid[i][3])
-      continue;
+    char d = DesiredLetter(i);
 
-    char v = grid[i][2];
-    if (v == '.') continue;
+    int j = 2;
+    for (; j < 6; ++j) {
+      if (grid[i][j] != '.') break;
+    }
+
+    bool done = true;
+    for (int rj = j; rj < 6; ++rj) {
+      if (grid[i][rj] != d) done = false;
+    }
+    if (done) continue;
+
     for (int ni = i; ni > 0; --ni) {
       if (grid[ni][1] != '.') break;
       if (ni == 3 || ni == 5 || ni == 7 || ni == 9) continue;
-      block([self moveX:i Y:2 toX:ni Y:1]);
+      block([self moveX:i Y:j toX:ni Y:1]);
     }
     for (int ni = i; ni < 13; ++ni) {
       if (grid[ni][1] != '.') break;
       if (ni == 3 || ni == 5 || ni == 7 || ni == 9) continue;
-      block([self moveX:i Y:2 toX:ni Y:1]);
+      block([self moveX:i Y:j toX:ni Y:1]);
     }
   }
 
-  // Move from destination 2
-  for (int i = 3; i < 10; i += 2) {
-    char v = grid[i][3];
-    if (v == '.') continue;
-    if (DesiredLetter(i) == v) continue;
-
-    if (grid[i][2] != '.') continue;
-    for (int ni = i; ni > 0; --ni) {
-      if (grid[ni][1] != '.') break;
-      if (ni == 3 || ni == 5 || ni == 7 || ni == 9) continue;
-      block([self moveX:i Y:3 toX:ni Y:1]);
-    }
-    for (int ni = i; ni < 13; ++ni) {
-      if (grid[ni][1] != '.') break;
-      if (ni == 3 || ni == 5 || ni == 7 || ni == 9) continue;
-      block([self moveX:i Y:3 toX:ni Y:1]);
-    }
-  }
 
   // Move home from corridor
   for (int i = 1; i < 12; ++i) {
@@ -161,12 +152,20 @@ int DesiredHome(char c) {
     }
     if (ti != di) continue;
 
-    if (grid[ti][2] == '.' && grid[ti][3] == '.') {
-      block([self moveX:i Y:1 toX:di Y:3]);
+    int j = 2;
+    for (; j < 6; ++j) {
+      if (grid[di][j] != '.') break;
     }
-    if (grid[ti][2] == '.' && grid[ti][3] == v) {
-      block([self moveX:i Y:1 toX:di Y:2]);
+
+    bool done = true;
+    for (int rj = j; rj < 6; ++rj) {
+      if (grid[di][rj] != v) done = false;
     }
+    if (!done) continue;
+
+    --j;
+    assert(j >= 2 && grid[di][j] == '.');
+    block([self moveX:i Y:1 toX:di Y:j]);
   }
 }
 
@@ -204,13 +203,13 @@ int day23part1(Map* m) {
 }
 
 int day23part2(Map* m) {
-  return 0;
+  return day23part1(m);
 }
 
 int day23main(int argc, const char** argv) {
   id lines = splitLines(readFile(@"input/day23.txt"));
   Map* m = [Map alloc];
-  for (int j = 0; j < 5; ++j) {
+  for (int j = 0; j < 7; ++j) {
     id line = lines[j];
     for (int i = 0; i < 13; ++i) {
       if (i < [line length]) {
@@ -220,7 +219,16 @@ int day23main(int argc, const char** argv) {
       }
     }
   }
-  NSLog(@"Part 1: %d", day23part1(m));
+  Map* p = [m copy];
+  for (int i = 0; i < 13; ++i) {
+    p->grid[i][3] = m->grid[i][5];
+  }
+  p->grid[3][4] = 'A'; p->grid[3][5] = 'A';
+  p->grid[5][4] = 'B'; p->grid[5][5] = 'B';
+  p->grid[7][4] = 'C'; p->grid[7][5] = 'C';
+  p->grid[9][4] = 'D'; p->grid[9][5] = 'D';
+
+  NSLog(@"Part 1: %d", day23part1(p));
   NSLog(@"Part 2: %d", day23part2(m));
   return 0;
 }
