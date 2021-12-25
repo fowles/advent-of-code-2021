@@ -27,13 +27,10 @@
 #import "day23.h"
 #import "day24.h"
 #import "day25.h"
-#import "day26.h"
-#import "day27.h"
-#import "day28.h"
 
 int main(int argc, const char** argv) {
   chdir(getenv("BUILD_WORKING_DIRECTORY"));
   @autoreleasepool {
-    return day24main(argc, argv);
+    return day25main(argc, argv);
   }
 }
